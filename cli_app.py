@@ -6,7 +6,7 @@ dotenv.load_dotenv()
 
 
 if __name__ == "__main__":
-    with open(DOCUMENT_ID + ".pkl", "rb") as f:
+    with open(STORE_NAME + ".pkl", "rb") as f:
         vectorstore = pickle.load(f)
     qa_chain = get_chain(vectorstore)
     chat_history = []

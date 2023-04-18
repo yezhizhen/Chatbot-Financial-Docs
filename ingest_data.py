@@ -10,16 +10,22 @@ from constants import *
 #load openai_api_key
 dotenv.load_dotenv()
 
-FOLDER_PATH = os.path.join(".", DOCUMENT_ID) 
+
 
 raw_documents = []
 # Load Data
-for file in os.listdir(FOLDER_PATH):
-    loader = UnstructuredFileLoader(os.path.join(FOLDER_PATH, file))
-    raw_documents += loader.load()
+for root, dirs, files in os.walk(FOLDER_PATH):
+    source_files = [file for file in files if os.path.splitext(file)[1] == '.txt']
+    for file in source_files:
+        try:
+            loader = UnstructuredFileLoader(os.path.join(root, file))
+            raw_documents += loader.load()
+        except Exception as e:
+            print(f"{file} has failed, in {root}")
+            print(e)
 
 # Split text
-text_splitter = RecursiveCharacterTextSplitter(chunk_size= 3400, chunk_overlap = 50)
+text_splitter = RecursiveCharacterTextSplitter(chunk_size= 3400, chunk_overlap = 0)
 documents = text_splitter.split_documents(raw_documents)
 
 
@@ -29,5 +35,5 @@ vectorstore = FAISS.from_documents(documents, embeddings)
 
 
 # Save vectorstore
-with open(DOCUMENT_ID + ".pkl", "wb") as f:
+with open(STORE_NAME + ".pkl", "wb") as f:
     pickle.dump(vectorstore, f)
