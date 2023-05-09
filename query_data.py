@@ -1,7 +1,7 @@
 from langchain.prompts.prompt import PromptTemplate
 from langchain.llms import OpenAI
 from langchain.chains import ConversationalRetrievalChain
-from langchain.memory import ConversationBufferMemory
+from langchain.memory import ConversationBufferWindowMemory
 
 '''
 template = """Answering questions about the corporate financial status and providing investment advise, 
@@ -23,7 +23,9 @@ def get_chain(vectorstore):
     qa_chain = ConversationalRetrievalChain.from_llm(
         OpenAI(temperature=0),
         vectorstore.as_retriever(),
-        memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True, output_key='answer'),
-        return_source_documents=True
+        memory = ConversationBufferWindowMemory(k = 2, memory_key="chat_history", return_messages=True, output_key='answer'),
+        return_source_documents=True,
+        #verbose= True
     )
+    qa_chain.max_tokens_limit = 4096
     return qa_chain

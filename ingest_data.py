@@ -41,5 +41,5 @@ print(f"Took {time.time()-start}s to create embedding." )
 
 
 # Save vectorstore
-with open(STORE_NAME + ".pkl", "wb") as f:
+with open(os.path.join('embedded_store', STORE_NAME + ".pkl"), "wb") as f:
     pickle.dump(vectorstore, f)

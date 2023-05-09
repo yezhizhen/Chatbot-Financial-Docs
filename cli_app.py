@@ -2,13 +2,12 @@ import pickle
 from query_data import get_chain
 from constants import *
 import dotenv
-from collections import deque
 from os import path
 dotenv.load_dotenv()
 
 
 if __name__ == "__main__":
-    with open(STORE_NAME + ".pkl", "rb") as f:
+    with open(path.join('embedded_store', STORE_NAME + ".pkl"), "rb") as f:
         vectorstore = pickle.load(f)
     qa_chain = get_chain(vectorstore)
     #limit the length of history
