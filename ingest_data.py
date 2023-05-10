@@ -37,7 +37,7 @@ start = time.time()
 # Load Data to vectorstore
 embeddings = OpenAIEmbeddings()
 vectorstore = FAISS.from_documents(documents, embeddings)
-print(f"Took {time.time()-start}s to create embedding." )
+print(f"Took {time.time()-start}s to create embedding {STORE_NAME}." )
 
 
 # Save vectorstore

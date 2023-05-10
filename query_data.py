@@ -27,5 +27,5 @@ def get_chain(vectorstore):
         return_source_documents=True,
         #verbose= True
     )
-    qa_chain.max_tokens_limit = 4096
+    qa_chain.max_tokens_limit = 4095
     return qa_chain

@@ -1,4 +1,4 @@
-all.pkl
+trans_earning.pkl
     all transcripts, earning calls etc.
     
 filing_all.pkl
@@ -7,6 +7,13 @@ filing_all.pkl
     
 combined.pkl
     combined above
-    
+
+MSFT_filing.pkl
+    Just Filings
+
+MSFT_transcripts
+    Just Transcripts
+
 MSFT_filing_transcripts.pkl
     Microsoft, with filing and transcripts.
+

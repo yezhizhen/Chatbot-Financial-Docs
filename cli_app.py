@@ -11,7 +11,7 @@ if __name__ == "__main__":
         vectorstore = pickle.load(f)
     qa_chain = get_chain(vectorstore)
     #limit the length of history
-    print("Chat with your docs!")
+    print("Ask questions related to corporate finance!")
     while True:
         print("Human:")
         question = input()
