@@ -3,3 +3,6 @@ openai == 0.26.5
 unstructured
 faiss-cpu == 1.7.3
 python-dotenv
+tiktoken
+pdf2image
+pytesseract
