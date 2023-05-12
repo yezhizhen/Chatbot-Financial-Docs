@@ -1,8 +1,7 @@
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.document_loaders import UnstructuredFileLoader
-from langchain.vectorstores.faiss import FAISS
+from langchain.vectorstores import FAISS
 from langchain.embeddings import OpenAIEmbeddings
-import pickle
 import dotenv
 import os
 from constants import *
@@ -41,5 +40,4 @@ print(f"Took {time.time()-start}s to create embedding {STORE_NAME}." )
 
 
 # Save vectorstore
-with open(os.path.join('embedded_store', STORE_NAME + ".pkl"), "wb") as f:
-    pickle.dump(vectorstore, f)
+vectorstore.save_local(os.path.join('embedded_store', STORE_NAME))

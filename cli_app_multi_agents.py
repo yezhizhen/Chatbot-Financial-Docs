@@ -3,15 +3,15 @@ from query_data import get_chain
 from constants import *
 import dotenv
 from os import path
+from langchain.vectorstores import FAISS
+from langchain.embeddings.openai import OpenAIEmbeddings
 dotenv.load_dotenv()
 
 if __name__ == "__main__":
     chains = []
     for STORE in STORES:
-        with open(path.join('embedded_store', STORE + ".pkl"), "rb") as f:
-            vectorstore = pickle.load(f)
+        vectorstore = FAISS.load_local(path.join('embedded_store', STORE), OpenAIEmbeddings())
         chains.append(get_chain(vectorstore))
-
 
     #limit the length of history
     print("Ask questions related to corporate finance!")

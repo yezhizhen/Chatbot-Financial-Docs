@@ -1,9 +1,10 @@
-import pickle
 from query_data import get_chain
 from constants import *
 import dotenv
 from os import path
 import argparse
+from langchain.vectorstores import FAISS
+from langchain.embeddings.openai import OpenAIEmbeddings
 
 dotenv.load_dotenv()
 
@@ -19,8 +20,7 @@ if __name__ == "__main__":
     if history:
         print("Source enabled!")
 
-    with open(path.join('embedded_store', STORE_NAME + ".pkl"), "rb") as f:
-        vectorstore = pickle.load(f)
+    vectorstore = FAISS.load_local(path.join('embedded_store', STORE_NAME), OpenAIEmbeddings())
     qa_chain = get_chain(vectorstore)
     #limit the length of history
     print("Ask questions related to corporate finance!")
