@@ -9,13 +9,15 @@ from langchain import PromptTemplate
 from flask import Flask
 from flask import request
 import sys
+from collections import deque
+
 
 dotenv.load_dotenv()
 vectorstore = FAISS.load_local(path.join('embedded_store', STORE_NAME), OpenAIEmbeddings())
 qa_chain = get_chain(vectorstore)
 
-user_list = []
-history_list = []
+user_list = deque(maxlen=10)
+history_list = deque(maxlen=10)
 app = Flask(__name__)
 
 
@@ -31,15 +33,18 @@ def getAnswer(question,user):
   u = index_of(user,user_list)
   if u==-1:
     user_list.append(user)
-    history_list.append([])
+    history_list.append(deque(maxlen=3))
     u = len(user_list) - 1
   result = qa_chain({"question": question,"chat_history":history_list[u]})
   history_list[u].append((question, result["answer"]))
+  '''
+  Using deque with maxlen. No need for pop now.
   if len(history_list[u])>3:
     history_list[u].pop(0)
   if len(user_list)>10:
     user_list.pop(0)
     history_list.pop(0)
+  '''
   print(history_list)
   sys.stdout.flush()
   return result["answer"]
