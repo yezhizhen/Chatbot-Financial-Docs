@@ -1,6 +1,5 @@
 import pickle
 from query_data import get_chain
-from constants import *
 import dotenv
 from os import path
 import argparse

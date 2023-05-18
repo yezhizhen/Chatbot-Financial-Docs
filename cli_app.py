@@ -10,7 +10,7 @@ dotenv.load_dotenv()
 
 
 def pre_process():
-    parser = argparse.ArgumentParser(description='A cli app for interacting with financial documents')
+    parser = argparse.ArgumentParser(description='A app for interacting with pre compiled documents')
     parser.add_argument('--source', action='store_true', help='enable source tracking')
     args = parser.parse_args()
     return args.source
@@ -23,7 +23,7 @@ if __name__ == "__main__":
     vectorstore = FAISS.load_local(path.join('embedded_store', STORE_NAME), OpenAIEmbeddings())
     qa_chain = get_chain(vectorstore)
     #limit the length of history
-    print("Ask questions related to corporate finance!")
+    print(WELCOME_MSG)
     while True:
         print("Human:")
         question = input()
