@@ -1,5 +1,5 @@
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain.document_loaders import UnstructuredFileLoader
+from langchain.document_loaders import UnstructuredFileLoader, TextLoader
 from langchain.vectorstores import FAISS
 from langchain.embeddings import OpenAIEmbeddings
 import dotenv
@@ -21,7 +21,8 @@ for root, dirs, files in os.walk(FOLDER_PATH):
     print(f"Found {len(source_files)} to load in {root}")
     for file in source_files:
         try:
-            loader = UnstructuredFileLoader(os.path.join(root, file))
+            loader = TextLoader(os.path.join(root, file), encoding='utf8')
+            #loader = UnstructuredFileLoader(os.path.join(root, file), encoing='utf8')
             raw_documents += loader.load()
         except Exception as e:
             print(f"{file} has failed, in {root}")
