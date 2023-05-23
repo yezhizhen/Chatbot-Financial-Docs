@@ -22,17 +22,27 @@ prompt = PromptTemplate(template=template, input_variables=["context", "question
 class date_ordered_retriever(BaseRetriever):
     retriever: VectorStoreRetriever
     date_pattern = re.compile(r'(\d+).txt')
- 
+    
+    def get_date(self, doc):
+        return self.date_pattern.search(doc.metadata["source"]).group(1) 
+
     def __init__(self, _retriever) -> None:
         super().__init__()
         self.retriever = _retriever
     
     def get_relevant_documents(self, query: str):
-        initial_docs = self.retriever.get_relevant_documents(query) 
+        initial_docs = self.retriever.get_relevant_documents(query)
+        
         def key_func(doc):
-            return self.date_pattern.search(doc.metadata["source"]).group(1)
+            return self.get_date(doc)
 
         initial_docs.sort(key= key_func, reverse= True)
+        #return those with highest years 
+        latest_year = self.get_date(initial_docs[0])[:4]
+        for i in range(1, len(initial_docs)):
+            if self.get_date(initial_docs[i])[:4] != latest_year:
+                return initial_docs[:i]
+
         return initial_docs
 
 
