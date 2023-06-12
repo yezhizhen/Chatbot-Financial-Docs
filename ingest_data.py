@@ -28,10 +28,12 @@ for root, dirs, files in os.walk(FOLDER_PATH):
             print(f"{file} has failed, in {root}")
             print(e)
 
-print(f"Took {time.time()-start}s to chunk files." )
+
 # Split text
-text_splitter = RecursiveCharacterTextSplitter(chunk_size= 3400, chunk_overlap = 0)
+text_splitter = RecursiveCharacterTextSplitter(chunk_size= 3100, chunk_overlap = 0)
 documents = text_splitter.split_documents(raw_documents)
+
+print(f"Took {time.time()-start}s to chunk files." )
 
 start = time.time()
 # Load Data to vectorstore
