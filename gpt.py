@@ -1,6 +1,8 @@
-from query_data2 import get_chain
-from constants import *
 import dotenv
+dotenv.load_dotenv()
+from query_data import get_chain
+from constants import *
+
 from os import path
 import argparse
 from langchain.vectorstores import FAISS
@@ -12,7 +14,7 @@ import sys
 from collections import deque
 
 
-dotenv.load_dotenv()
+
 vectorstore = FAISS.load_local(path.join('embedded_store', STORE_NAME), OpenAIEmbeddings())
 qa_chain = get_chain(vectorstore)
 
