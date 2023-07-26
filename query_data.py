@@ -9,29 +9,18 @@ from constants import MAX_HISTORY_LEN
 from langchain.vectorstores import FAISS
 from langchain.embeddings.openai import OpenAIEmbeddings
 from os import path
+from utility import my_util
+from constants import MODEL
 
 # If you don't know the answer, just say "I'm not sure." Don't try to make up an answer.
-template = """You are investment advisor.
-Assume audience are novice investors. 
-You are also tasked with making sure they understand the answer, and if they need any other help.
-Answer only in the third person.
-If question is unrelated to financial markets, and related to investment advice or how to trade - you must tell the user to contact their OSPL Trading Representative.
-Answer and explain related questions only within the context below. 
+template = """
+Only use the following context to provide the answer to the question at the end.  Must reply I don't have the answer to this question if there is no answer from the context or the question is about tagline.
+Any question about investment recommendation or stock trading advice (except about financial performance and comparsion), must answer please contact the Trading Representative of your broker.
 
 {context}
 
-Question: {question}
-Helpful Answer:"""
-
-
-
-
-"""Answer investment related question only within the context below. 
-
-{context}
-
-Question: {question}
-Helpful Answer:"""
+Question: {question}. Summarize in not more than 150 words.
+Helpful  Answer:"""
 
 prompt = PromptTemplate(template=template, input_variables=["context", "question"])
 
@@ -55,8 +44,10 @@ class latest_n_year_retriever(BaseRetriever):
         self.n = _n
     
     def get_relevant_documents(self, query: str):
-        ratio_doc = self.ratios_store.similarity_search(query, k = 1)
-        
+        #can be paralleled
+        ratio_doc = self.ratios_store.similarity_search_with_score(query, k = 1)
+        #[(ratio1(page_content, doc),score), ...]
+        #print(ratio_doc)
         initial_docs = self.retriever.get_relevant_documents(query)
 
         def key_func(doc):
@@ -72,7 +63,8 @@ class latest_n_year_retriever(BaseRetriever):
                 res =  initial_docs[:i]
                 break
         #put ratio in the middle, in case it takes priority response
-        return res[:int(len(res)/2)] + [ratio_doc[0]] + res[int(len(res)/2):]  
+        fin= res[:int(len(res)/3)] + [ratio_doc[0][0]] + res[int(len(res)/3):]  
+        return fin
 
     async def aget_relevant_documents(self, query: str):
         raise NotImplementedError
@@ -82,17 +74,20 @@ class latest_n_year_retriever(BaseRetriever):
 
 #return documents in latest the year among results
 
-
 def get_chain(vectorstore, n = 1, k = 6):
     qa_chain = ConversationalRetrievalChain.from_llm(
-        OpenAI(temperature=0),
+        OpenAI(temperature=0), #add model_name
         #default retriever: vectorstore.as_retriever()
         latest_n_year_retriever(vectorstore.as_retriever(search_kwargs={"k":k}), n),
         #remove memory and pass in "chat_history" when calling for manual passing
         memory = ConversationBufferWindowMemory(k = MAX_HISTORY_LEN, memory_key="chat_history", return_messages=True, output_key='answer'),
         return_source_documents=True,
         combine_docs_chain_kwargs={"prompt": prompt},
+        #max_tokens_limit = 4097 - 256 - Base.get_num_tokens(template)
         #verbose= True
     )
-    qa_chain.max_tokens_limit = 4097 - 30 - qa_chain.combine_docs_chain.llm_chain.llm.get_num_tokens(template)
+
+    template_token = my_util.num_tokens_from_string(template, MODEL)
+    print(f"Template occpuies {template_token} tokens")
+    qa_chain.max_tokens_limit = 4097 - 270 - template_token
     return qa_chain
