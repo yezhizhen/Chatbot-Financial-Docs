@@ -14,13 +14,12 @@ from constants import MODEL
 
 # If you don't know the answer, just say "I'm not sure." Don't try to make up an answer.
 template = """
-Only use the following context to provide the answer to the question at the end.  Must reply I don't have the answer to this question if there is no answer from the context or the question is about tagline.
-Any question about investment recommendation or stock trading advice (except about financial performance and comparsion), must answer please contact the Trading Representative of your broker.
+Use the following context to provide the answer to the question at the end. Answer "I don't have the answer to this question" if there is no answer from the context or the question is about tagline.
 
 {context}
 
-Question: {question}. Summarize in not more than 150 words.
-Helpful  Answer:"""
+Question: {question}. Summarize in no more than 150 words and in complete sentences. Any question about investment recommendation or stock trading advice (except about financial performance and comparsion), must answer "please contact the Trading Representative of your broker".
+Helpful Answer:"""
 
 prompt = PromptTemplate(template=template, input_variables=["context", "question"])
 
