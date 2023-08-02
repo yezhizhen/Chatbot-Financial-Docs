@@ -3,6 +3,8 @@ STORE_NAME = "US_SGP_HKG_all"
 STORES = ['MSFT_filing','MSFT_transcripts']
 WELCOME_MSG = "Hello! Ask anything!"
 MODEL = "text-davinci-003"
+RATIO_THRESHOLD = 0.45
+DEFINITION_THRESHOLD = 0.41
 
 
 

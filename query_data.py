@@ -10,16 +10,15 @@ from langchain.vectorstores import FAISS
 from langchain.embeddings.openai import OpenAIEmbeddings
 from os import path
 from utility import my_util
-from constants import MODEL
+from constants import *
 
 # If you don't know the answer, just say "I'm not sure." Don't try to make up an answer.
 template = """
-Use the following context to provide the answer to the question at the end. Answer "I don't have the answer to this question" if there is no answer from the context or the question is about tagline.
+Use the following context to provide the answer to the question at the end. Answer "I don't have the answer to this question" if there is no answer from the context or the question is about tagline. Any question about investment recommendation or stock trading advice (except about financial performance and comparsion), must answer "please contact the Trading Representative of your broker".
 
 {context}
 
-Question: {question}. Summarize in no more than 150 words and in complete sentences. Any question about investment recommendation or stock trading advice (except about financial performance and comparsion), must answer "please contact the Trading Representative of your broker".
-Helpful Answer:"""
+Question: {question}. Summarize in no more than 150 words and in complete sentences. Helpful Answer:"""
 
 prompt = PromptTemplate(template=template, input_variables=["context", "question"])
 
@@ -32,6 +31,7 @@ class latest_n_year_retriever(BaseRetriever):
     retriever: VectorStoreRetriever
     date_pattern = re.compile(r'(\d+).txt')
     ratios_store = FAISS.load_local(path.join('embedded_store', "Ratios"), OpenAIEmbeddings())
+    financial_definition_store = FAISS.load_local(path.join('embedded_store', "financial_definition"), OpenAIEmbeddings())
 
     def get_date(self, doc):
         res = self.date_pattern.search(doc.metadata["source"])
@@ -44,9 +44,15 @@ class latest_n_year_retriever(BaseRetriever):
     
     def get_relevant_documents(self, query: str):
         #can be paralleled
-        ratio_doc = self.ratios_store.similarity_search_with_score(query, k = 1)
+        #score is the distance
+        ratio_docs = self.ratios_store.similarity_search_with_score(query, k = 1)
+        def_docs = self.financial_definition_store.similarity_search_with_score(query, k = 2)
         #[(ratio1(page_content, doc),score), ...]
-        #print(ratio_doc)
+        #print(f"score for ratio doc is: {ratio_doc[0][1]}\n\nWith content {ratio_doc[0][0].page_content}\n\n")
+        #print(f"score for financial definition doc is: {def_docs[0][1]}\n\nWith content {def_docs[0][0].page_content}\n\n")
+        #print(f"score for financial definition doc is: {def_doc[1][1]}\n\nWith content {def_doc[1][0].page_content}\n")
+          
+        #Can try MMR next
         initial_docs = self.retriever.get_relevant_documents(query)
 
         def key_func(doc):
@@ -62,7 +68,8 @@ class latest_n_year_retriever(BaseRetriever):
                 res =  initial_docs[:i]
                 break
         #put ratio in the middle, in case it takes priority response
-        fin= res[:int(len(res)/3)] + [ratio_doc[0][0]] + res[int(len(res)/3):]  
+        fin= ([doc[0] for doc in ratio_docs if doc[1] < RATIO_THRESHOLD] + 
+        [doc[0] for doc in def_docs if doc[1] < DEFINITION_THRESHOLD] + res )
         return fin
 
     async def aget_relevant_documents(self, query: str):
@@ -76,7 +83,8 @@ class latest_n_year_retriever(BaseRetriever):
 def get_chain(vectorstore, n = 1, k = 6):
     qa_chain = ConversationalRetrievalChain.from_llm(
         OpenAI(temperature=0), #add model_name
-        #default retriever: vectorstore.as_retriever()
+        #default retriever: 
+        #vectorstore.as_retriever(),
         latest_n_year_retriever(vectorstore.as_retriever(search_kwargs={"k":k}), n),
         #remove memory and pass in "chat_history" when calling for manual passing
         memory = ConversationBufferWindowMemory(k = MAX_HISTORY_LEN, memory_key="chat_history", return_messages=True, output_key='answer'),
