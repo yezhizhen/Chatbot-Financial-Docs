@@ -7,7 +7,7 @@ from os import path
 import argparse
 from langchain.vectorstores import FAISS
 from langchain.embeddings.openai import OpenAIEmbeddings
-
+from collections import deque
 
 
 
@@ -35,11 +35,14 @@ if __name__ == "__main__":
     
 
     #limit the length of history
+    
+    chat_history = deque(maxlen=3)
     print(WELCOME_MSG)
     while True:
         print("Human:")
         question = input()
-        result = qa_chain({"question": question})
+        result = qa_chain({"question": question,"chat_history":chat_history})
+        chat_history.append((question, result["answer"]))
         print("AI:")
         print(result["answer"])
         print("")

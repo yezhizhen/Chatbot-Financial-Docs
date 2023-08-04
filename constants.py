@@ -2,10 +2,11 @@ MAX_HISTORY_LEN = 2
 STORE_NAME = "US_SGP_HKG_all"
 STORES = ['MSFT_filing','MSFT_transcripts']
 WELCOME_MSG = "Hello! Ask anything!"
-MODEL = "text-davinci-003"
+MODEL = "gpt-3.5-turbo"
 RATIO_THRESHOLD = 0.45
 DEFINITION_THRESHOLD = 0.41
 
+print(f"Using model {MODEL}")
 
 
 #following is dummy copy. ignore.

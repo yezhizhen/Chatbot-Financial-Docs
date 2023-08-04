@@ -4,8 +4,8 @@ from langchain.chains import ConversationalRetrievalChain
 from langchain.memory import ConversationBufferWindowMemory
 from langchain.vectorstores.base import VectorStoreRetriever
 from langchain.schema import BaseRetriever
+from langchain.chat_models import ChatOpenAI
 import re
-from constants import MAX_HISTORY_LEN
 from langchain.vectorstores import FAISS
 from langchain.embeddings.openai import OpenAIEmbeddings
 from os import path
@@ -14,7 +14,7 @@ from constants import *
 
 # If you don't know the answer, just say "I'm not sure." Don't try to make up an answer.
 template = """
-Use the following context to provide the answer to the question at the end. Answer "I don't have the answer to this question" if there is no answer from the context or the question is about tagline. Any question about investment recommendation or stock trading advice (except about financial performance and comparsion), must answer "please contact the Trading Representative of your broker".
+Use the following context to provide the answer to the question at the end. Answer "I don't have the answer to this question" if there is no answer from the context. Any question about investment recommendation or stock trading advice (except about financial performance and comparsion), must answer "please contact the Trading Representative of your broker".
 
 {context}
 
@@ -81,20 +81,21 @@ class latest_n_year_retriever(BaseRetriever):
 #return documents in latest the year among results
 
 def get_chain(vectorstore, n = 1, k = 6):
+    template_token = my_util.num_tokens_from_string(template, MODEL)
+    print(f"Template occpuies {template_token} tokens")
     qa_chain = ConversationalRetrievalChain.from_llm(
-        OpenAI(temperature=0), #add model_name
+        #openAI(temperature=0), #default as text-davinci-003. 
+        ChatOpenAI(temperature=0, model_name=MODEL),
+        #OpenAI(temperature=0),
         #default retriever: 
         #vectorstore.as_retriever(),
         latest_n_year_retriever(vectorstore.as_retriever(search_kwargs={"k":k}), n),
         #remove memory and pass in "chat_history" when calling for manual passing
-        memory = ConversationBufferWindowMemory(k = MAX_HISTORY_LEN, memory_key="chat_history", return_messages=True, output_key='answer'),
+        #memory = ConversationBufferWindowMemory(k = MAX_HISTORY_LEN, memory_key="chat_history", return_messages=True, output_key='answer'),
         return_source_documents=True,
         combine_docs_chain_kwargs={"prompt": prompt},
-        #max_tokens_limit = 4097 - 256 - Base.get_num_tokens(template)
+        max_tokens_limit = 4096 - 270 - template_token
         #verbose= True
     )
-
-    template_token = my_util.num_tokens_from_string(template, MODEL)
-    print(f"Template occpuies {template_token} tokens")
-    qa_chain.max_tokens_limit = 4097 - 270 - template_token
+    
     return qa_chain
