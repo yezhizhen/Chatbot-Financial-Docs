@@ -1,5 +1,5 @@
 from langchain.prompts.prompt import PromptTemplate
-from langchain.llms import OpenAI
+#from langchain.llms import OpenAI
 from langchain.chains import ConversationalRetrievalChain
 from langchain.memory import ConversationBufferWindowMemory
 from langchain.vectorstores.base import VectorStoreRetriever
@@ -17,7 +17,7 @@ from constants import *
 # Summarize in no more than 150 words and in complete sentences.
 #(except about financial performance and comparsion)
 template = """
-Use the following context to provide the answer to the question at the end. Any question about investment recommendation or stock trading advice, must be answered with "please contact the Trading Representative of your broker".
+Use the following context to provide the answer to the question at the end. Any question about stock recommendation, must be answered with "please contact the Trading Representative of your broker".
 
 {context}
 
@@ -94,6 +94,7 @@ def get_chain(vectorstore, n = 1, k = 6):
         #default retriever: 
         #vectorstore.as_retriever(),
         latest_n_year_retriever(vectorstore.as_retriever(search_kwargs={"k":k}), n),
+        condense_question_prompt = chatcx_rephrase_message,
         #remove memory and pass in "chat_history" when calling for manual passing
         #memory = ConversationBufferWindowMemory(k = MAX_HISTORY_LEN, memory_key="chat_history", return_messages=True, output_key='answer'),
         return_source_documents=True,
