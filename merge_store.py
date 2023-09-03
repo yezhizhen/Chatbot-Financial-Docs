@@ -5,16 +5,16 @@ import dotenv
 
 dotenv.load_dotenv()
 
-STORES = ["transcript", "filing_all"]
-FINAL_STORE = "filing_transcript_all"
+STORES = ["US_all", "SGP_all", "HKG_all"]
+FINAL_STORE = "US_SGP_HKG_all"
 
 res = None
 for store in STORES:
-    cur = FAISS.load_local(path.join('embedded_store', store), OpenAIEmbeddings())
-    if res is None:    
+    cur = FAISS.load_local(path.join("embedded_store", store), OpenAIEmbeddings())
+    if res is None:
         res = cur
     else:
         res.merge_from(cur)
 
 
-res.save_local(path.join('embedded_store', FINAL_STORE))
+res.save_local(path.join("embedded_store", FINAL_STORE))
