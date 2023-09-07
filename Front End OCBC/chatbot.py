@@ -70,16 +70,22 @@ def body():
             help="If set to N, will at most use N documents: with total token under model limits",
         )
 
-    st.caption(f"✅Selected stock: **:rainbow[{ric}]**")
+    st.caption(f"✅Selected stock: **:blue[{ric}]**")
 
     # 👈 Draw the string 'x' and then the value of x
 
     with st.expander("Chat History", expanded=True):
         for item in st.session_state.chat_history:
             # Human turn
-            st.warning(item[0], icon=st.session_state.avatar)
+            with st.chat_message("user"):  # can add user name, avatar in sidebar later
+                item[0]
+                # st.warning(item[0], icon=st.session_state.avatar)
             # bots turn
-            st.success(item[1], icon="🤖")
+            with st.chat_message(
+                "ai", avatar=path.join(st.session_state.relative_dir_name, "icon.png")
+            ):
+                item[1]
+            # st.success(item[1], icon="🤖")
 
     user_input = st.text_area(
         "Your turn",
@@ -90,7 +96,7 @@ def body():
     def chat_handler():
         with st.spinner("Waiting for response..."):
             if user_input.strip() == "":
-                st.toast("Done!", icon="⚠️")
+                st.toast("Empty input not allowed", icon="⚠️")
                 # st.warning("Empty input not allowed", icon="⚠️")
                 return
             # add plain question to chat_history, to avoid long context
@@ -101,6 +107,11 @@ def body():
             # add response to history
             st.session_state.chat_history.append((user_input, response))
             st.toast("Done!", icon="✅")
+
+    # not usable yet
+    # user_input = st.chat_input(
+    #     placeholder="Type your questions", on_submit=chat_handler
+    # )
 
     _, chat, reset = st.columns([0.8, 1, 1])
     with chat:
