@@ -20,6 +20,8 @@ def heading():
         # 👋
         page_icon=path.join(st.session_state.relative_dir_name, "icon.png"),
         menu_items={"About": "# A chatbot for financial statements/documents"},
+        initial_sidebar_state="collapsed",
+        layout="centered",
     )
     st.title("ChatCX")
 
@@ -51,7 +53,8 @@ def body():
     with col1:
         # window_length_of_years, num_initial_docs
         window_len = st.slider(
-            ":rainbow[Window size of years]",
+            # ":rainbow[Window size of years]",
+            "Number of historical years",
             min_value=1,
             max_value=4,
             value=1,
@@ -59,7 +62,8 @@ def body():
         )
     with col2:
         doc_num = st.slider(
-            ":rainbow[Max limit of documents used]",
+            # ":rainbow[Max limit of documents used]",
+            "Number of documents",
             min_value=1,
             max_value=8,
             value=4,
@@ -78,18 +82,25 @@ def body():
             st.success(item[1], icon="🤖")
 
     user_input = st.text_area(
-        "Your turn", help="Type your message. Click 'Chat' to get response"
+        "Your turn",
+        help="Type your message. Click 'Chat' to get response",
+        placeholder="Type your questions",
     )
 
     def chat_handler():
-        if user_input.strip() == "":
-            st.warning("Empty input not allowed", icon="⚠️")
-            return
-        # add plain question to chat_history, to avoid long context
-        # chat through openai
-        response, sources = get_chat_response(user_input, window_len, doc_num, market)
-        # add response to history
-        st.session_state.chat_history.append((user_input, response))
+        with st.spinner("Waiting for response..."):
+            if user_input.strip() == "":
+                st.toast("Done!", icon="⚠️")
+                # st.warning("Empty input not allowed", icon="⚠️")
+                return
+            # add plain question to chat_history, to avoid long context
+            # chat through openai
+            response, sources = get_chat_response(
+                user_input, window_len, doc_num, market
+            )
+            # add response to history
+            st.session_state.chat_history.append((user_input, response))
+            st.toast("Done!", icon="✅")
 
     _, chat, reset = st.columns([0.8, 1, 1])
     with chat:
@@ -100,16 +111,18 @@ def body():
 
 def side_bar():
     st.sidebar.markdown("# User config 🦄")
-    st.sidebar.selectbox("Your avatar:", ["👧", "👦", "👸", "🤴"], key="avatar")
+    st.sidebar.selectbox(
+        "Your avatar:", ["🧍‍♀️", "🧍‍♂️", "👧", "👦", "👸", "🤴"], key="avatar"
+    )
     st.sidebar.text_input("Your name", key="user_name")
 
 
 heading()
 from chat_core import *
 
+hide_footer()
 side_bar()
 state_init()
-hide_footer()
 
 
 body()
