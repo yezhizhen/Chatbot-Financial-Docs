@@ -36,17 +36,20 @@ def body():
     with col1:
         market = st.selectbox("Select market:", ["HKG", "SGP", "US", "all"]).lower()
 
-    with col2:
+    @st.cache_data
+    def get_stocks(market):
         with open(
             path.join(st.session_state.relative_dir_name, "stocks.json"), "r"
         ) as f:
             stocks = json.load(f)
             if market == "all":
-                ric = st.selectbox(
-                    "Stock:", sorted([val for vals in stocks.values() for val in vals])
-                )
+                return sorted([val for vals in stocks.values() for val in vals])
             else:
-                ric = st.selectbox("Stock:", sorted(stocks[market]))
+                return sorted(stocks[market])
+
+    with col2:
+        stocks = get_stocks(market)
+        ric = st.selectbox("Stock:", stocks)
 
     # window_length_of_years, num_initial_docs
     col1, col2 = st.columns(2)
@@ -102,7 +105,7 @@ def body():
             # add plain question to chat_history, to avoid long context
             # chat through openai
             response, sources = get_chat_response(
-                user_input, window_len, doc_num, market
+                user_input, window_len, doc_num, market, ric
             )
             # add response to history
             st.session_state.chat_history.append((user_input, response))

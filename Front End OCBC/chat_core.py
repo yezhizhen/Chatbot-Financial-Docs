@@ -60,8 +60,22 @@ def get_qa_chain(market, window_length_of_years, num_initial_docs):
         f"Getting chain with window length: {window_length_of_years}, docs limit: {num_initial_docs}, in {market}"
     )
     from query_data import get_chain
+    from langchain.prompts.prompt import PromptTemplate
 
-    return get_chain(get_vectorstore(market), window_length_of_years, num_initial_docs)
+    template = """You are a corporate performance analyst for {ric}. Use the following context to provide an answer to the question at the end. Any question about stock recommendation, must be answered with "please contact the Trading Representative of your broker".
+
+    {context}
+
+    Question: {question}   Answer:
+    """
+
+    prompt = PromptTemplate(
+        template=template, input_variables=["ric", "context", "question"]
+    )
+
+    return get_chain(
+        get_vectorstore(market), window_length_of_years, num_initial_docs, prompt
+    )
 
 
 def get_response(chat_history: list[str]):
@@ -81,13 +95,17 @@ def get_response(chat_history: list[str]):
     return res["choices"][0]["message"]["content"]
 
 
-def get_chat_response(question, window_length_of_years, num_initial_docs, market):
+def get_chat_response(question, window_length_of_years, num_initial_docs, market, ric):
     """
     Return answer and source
     """
     qa_chain = get_qa_chain(market, window_length_of_years, num_initial_docs)
     result = qa_chain(
-        {"question": question, "chat_history": st.session_state.chat_history}
+        {
+            "question": question,
+            "chat_history": st.session_state.chat_history,
+            "ric": ric,
+        }
     )
     # chat_history.append((question, result["answer"]))
     return result["answer"], result["source_documents"]

@@ -17,15 +17,16 @@ from constants import *
 # If you don't know the answer, just say "I'm not sure." Don't try to make up an answer.
 # Summarize in no more than 150 words and in complete sentences.
 # (except about financial performance and comparsion)
-template = """
-You are a corporate performance analyst. Use the following context to provide the answer to the question at the end. Any question about stock recommendation, must be answered with "please contact the Trading Representative of your broker".
+template = """You are a corporate performance analyst. Use the following context to provide the answer to the question at the end. Any question about stock recommendation, must be answered with "please contact the Trading Representative of your broker".
 
 {context}
 
 Question: {question}   Answer:
 """
 
-prompt = PromptTemplate(template=template, input_variables=["context", "question"])
+default_prompt = PromptTemplate(
+    template=template, input_variables=["context", "question"]
+)
 
 # combine_docs in qa_chain needs the openAI.
 # question_generator needs the openAI.
@@ -95,7 +96,7 @@ class latest_n_year_retriever(BaseRetriever):
 # return documents in latest the year among results
 
 
-def get_chain(vectorstore, n=1, k=6):
+def get_chain(vectorstore, n=1, k=6, prompt=default_prompt):
     template_token = my_util.num_tokens_from_string(template, MODEL)
     print(f"Template occpuies {template_token} tokens")
     qa_chain = ConversationalRetrievalChain.from_llm(
