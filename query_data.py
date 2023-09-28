@@ -55,7 +55,7 @@ class latest_n_year_retriever(BaseRetriever):
     def get_relevant_documents(self, query: str):
         # can be paralleled
         # score is the distance
-        ratio_docs = self.ratios_store.similarity_search_with_score(query, k=1)
+        ratio_docs = self.ratios_store.similarity_search_with_score(query, k=2)
         def_docs = self.financial_definition_store.similarity_search_with_score(
             query, k=2
         )
@@ -105,7 +105,9 @@ def get_chain(vectorstore, n=1, k=6, prompt=default_prompt):
         # OpenAI(temperature=0),
         # default retriever:
         # vectorstore.as_retriever(),
-        latest_n_year_retriever(vectorstore.as_retriever(search_kwargs={"k": k}), n),
+        latest_n_year_retriever(
+            vectorstore.as_retriever(search_kwargs={"k": k}, search_type="mmr"), n
+        ),
         condense_question_prompt=chatcx_rephrase_message,
         # remove memory and pass in "chat_history" when calling for manual passing
         # memory = ConversationBufferWindowMemory(k = MAX_HISTORY_LEN, memory_key="chat_history", return_messages=True, output_key='answer'),

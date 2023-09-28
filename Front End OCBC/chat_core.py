@@ -49,7 +49,9 @@ def get_retriever(window_length_of_years, num_initial_docs, market):
     )
     vectorstore = get_vectorstore(market)
     return latest_n_year_retriever(
-        vectorstore.as_retriever(search_kwargs={"k": num_initial_docs}),
+        vectorstore.as_retriever(
+            search_kwargs={"k": num_initial_docs}, search_type="mmr"
+        ),
         window_length_of_years,
     )
 
@@ -62,10 +64,11 @@ def get_qa_chain(market, window_length_of_years, num_initial_docs):
     from query_data import get_chain
     from langchain.prompts.prompt import PromptTemplate
 
-    template = """You are a corporate performance analyst. Use the following context to provide an answer to the question at the end. Any question about stock recommendation, must be answered with "please contact the Trading Representative of your broker".
+    template = """You are an analyst, evaluating corporate performance. Use the following context to provide an answer to the question at the end.
 
-    {context}
+    Context: {context}
 
+    ###
     Question: {question}   Answer:
     """
 
@@ -100,7 +103,7 @@ def get_chat_response(question, window_length_of_years, num_initial_docs, market
     qa_chain = get_qa_chain(market, window_length_of_years, num_initial_docs)
     result = qa_chain(
         {
-            "question": f"For {ric}, " + question,
+            "question": f"{ric}. " + question,
             "chat_history": st.session_state.chat_history,
             "ric": ric,
         }
