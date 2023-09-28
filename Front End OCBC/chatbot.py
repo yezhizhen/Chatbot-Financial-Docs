@@ -19,7 +19,9 @@ def heading():
         page_title="WealthCX Chatbot V2",
         # 👋
         page_icon=path.join(st.session_state.relative_dir_name, "icon.png"),
-        menu_items={"About": "# A chatbot for financial statements/documents"},
+        menu_items={
+            "About": """# A chatbot for financial statements/documents. \nFor any question about stock recommendation, please contact the Trading Representative of your broker."""
+        },
         initial_sidebar_state="collapsed",
         layout="centered",
     )
@@ -60,7 +62,7 @@ def body():
             "Number of historical years",
             min_value=1,
             max_value=4,
-            value=1,
+            value=3,
             help='If set to N, then will look into "latest N years" among search results',
         )
     with col2:
@@ -69,7 +71,7 @@ def body():
             "Number of documents",
             min_value=1,
             max_value=8,
-            value=4,
+            value=6,
             help="If set to N, will at most use N documents: with total token under model limits",
         )
 
