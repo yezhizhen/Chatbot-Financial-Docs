@@ -62,7 +62,7 @@ def body():
             "Number of historical years",
             min_value=1,
             max_value=4,
-            value=3,
+            value=2,
             help='If set to N, then will look into "latest N years" among search results',
         )
     with col2:
@@ -71,7 +71,7 @@ def body():
             "Number of documents",
             min_value=1,
             max_value=8,
-            value=6,
+            value=4,
             help="If set to N, will at most use N documents: with total token under model limits",
         )
 
@@ -104,10 +104,22 @@ def body():
                 st.toast("Empty input not allowed", icon="⚠️")
                 # st.warning("Empty input not allowed", icon="⚠️")
                 return
+
+            def modify_user_input(inp) -> str:
+                """
+                Rephrase question. For first question, add {ric} if not mentioned.
+                Do nothing for others
+                """
+                if len(st.session_state.chat_history) == 0:
+                    if ric.lower() not in inp.lower():
+                        return f"As for {ric}, {inp}"
+                return inp
+
             # add plain question to chat_history, to avoid long context
             # chat through openai
+
             response, sources = get_chat_response(
-                user_input, window_len, doc_num, market, ric
+                modify_user_input(user_input), window_len, doc_num, market, ric
             )
             # add response to history
             st.session_state.chat_history.append((user_input, response))

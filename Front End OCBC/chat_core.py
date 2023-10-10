@@ -103,7 +103,7 @@ def get_chat_response(question, window_length_of_years, num_initial_docs, market
     qa_chain = get_qa_chain(market, window_length_of_years, num_initial_docs)
     result = qa_chain(
         {
-            "question": f"{ric}. " + question,
+            "question": question,
             "chat_history": st.session_state.chat_history,
             "ric": ric,
         }
