@@ -53,6 +53,7 @@ def get_retriever(window_length_of_years, num_initial_docs, market):
             search_kwargs={"k": num_initial_docs}, search_type="mmr"
         ),
         window_length_of_years,
+        st.session_state.education_mode,
     )
 
 

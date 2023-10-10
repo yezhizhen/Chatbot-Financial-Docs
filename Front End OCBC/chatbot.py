@@ -34,9 +34,17 @@ def state_init():
 
 
 def body():
+    education_mode = st.checkbox(
+        "Education Mode",
+        help="If turned on, the bot only answers financial education questions",
+        key="education_mode",
+    )
+
     col1, col2 = st.columns(2)
     with col1:
-        market = st.selectbox("Select market:", ["HKG", "SGP", "US", "all"]).lower()
+        market = st.selectbox(
+            "Select market:", ["HKG", "SGP", "US", "all"], disabled=education_mode
+        ).lower()
 
     @st.cache_data
     def get_stocks(market):
@@ -51,7 +59,7 @@ def body():
 
     with col2:
         stocks = get_stocks(market)
-        ric = st.selectbox("Stock:", stocks)
+        ric = st.selectbox("Stock:", stocks, disabled=education_mode)
 
     # window_length_of_years, num_initial_docs
     col1, col2 = st.columns(2)
@@ -64,6 +72,7 @@ def body():
             max_value=4,
             value=2,
             help='If set to N, then will look into "latest N years" among search results',
+            disabled=education_mode,
         )
     with col2:
         doc_num = st.slider(
@@ -73,9 +82,11 @@ def body():
             max_value=8,
             value=4,
             help="If set to N, will at most use N documents: with total token under model limits",
+            disabled=education_mode,
         )
 
-    st.caption(f"✅Selected stock: **:blue[{ric}]**")
+    if not education_mode:
+        st.caption(f"✅Selected stock: **:blue[{ric}]**")
 
     # 👈 Draw the string 'x' and then the value of x
 
@@ -110,7 +121,7 @@ def body():
                 Rephrase question. For first question, add {ric} if not mentioned.
                 Do nothing for others
                 """
-                if len(st.session_state.chat_history) == 0:
+                if not education_mode and len(st.session_state.chat_history) == 0:
                     if ric.lower() not in inp.lower():
                         return f"As for {ric}, {inp}"
                 return inp

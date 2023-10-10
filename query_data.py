@@ -48,10 +48,11 @@ class latest_n_year_retriever(BaseRetriever):
         res = self.date_pattern.search(doc.metadata["source"])
         return res.group(1)
 
-    def __init__(self, _retriever, _n) -> None:
+    def __init__(self, _retriever, _n, _education_mode=False) -> None:
         super().__init__()
         self.retriever = _retriever
         self.n = _n
+        self.education_mode = _education_mode
 
     def get_relevant_documents(self, query: str):
         # can be paralleled
@@ -64,27 +65,26 @@ class latest_n_year_retriever(BaseRetriever):
         # print(f"score for ratio doc is: {ratio_doc[0][1]}\n\nWith content {ratio_doc[0][0].page_content}\n\n")
         # print(f"score for financial definition doc is: {def_docs[0][1]}\n\nWith content {def_docs[0][0].page_content}\n\n")
         # print(f"score for financial definition doc is: {def_doc[1][1]}\n\nWith content {def_doc[1][0].page_content}\n")
-
-        # Can try MMR next
-        initial_docs = self.retriever.get_relevant_documents(query)
-
         def key_func(doc):
             return self.get_date(doc)
 
-        initial_docs.sort(key=key_func, reverse=True)
+        filing_res = []
+        if not self.education_mode:
+            initial_docs = self.retriever.get_relevant_documents(query)
+            initial_docs.sort(key=key_func, reverse=True)
 
-        # return those with highest years
-        latest_year = self.get_date(initial_docs[0])[:4]
-        res = initial_docs
-        for i in range(1, len(initial_docs)):
-            if int(self.get_date(initial_docs[i])[:4]) < int(latest_year) - self.n:
-                res = initial_docs[:i]
-                break
+            # return those with highest years
+            latest_year = self.get_date(initial_docs[0])[:4]
+            filing_res = initial_docs
+            for i in range(1, len(initial_docs)):
+                if int(self.get_date(initial_docs[i])[:4]) < int(latest_year) - self.n:
+                    filing_res = initial_docs[:i]
+                    break
         # put ratio in the middle, in case it takes priority response
         fin = (
             [doc[0] for doc in ratio_docs if doc[1] < RATIO_THRESHOLD]
             + [doc[0] for doc in def_docs if doc[1] < DEFINITION_THRESHOLD]
-            + res
+            + filing_res
         )
         return fin
 
