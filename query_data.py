@@ -68,7 +68,6 @@ class latest_n_year_retriever(BaseRetriever):
         def key_func(doc):
             return self.get_date(doc)
 
-        filing_res = []
         if not self.education_mode:
             initial_docs = self.retriever.get_relevant_documents(query)
             initial_docs.sort(key=key_func, reverse=True)
@@ -80,12 +79,15 @@ class latest_n_year_retriever(BaseRetriever):
                 if int(self.get_date(initial_docs[i])[:4]) < int(latest_year) - self.n:
                     filing_res = initial_docs[:i]
                     break
-        # put ratio in the middle, in case it takes priority response
-        fin = (
-            [doc[0] for doc in ratio_docs if doc[1] < RATIO_THRESHOLD]
-            + [doc[0] for doc in def_docs if doc[1] < DEFINITION_THRESHOLD]
-            + filing_res
-        )
+            # put ratio in the middle, in case it takes priority response
+            fin = (
+                [doc[0] for doc in def_docs if doc[1] < DEFINITION_THRESHOLD]
+                + [doc[0] for doc in ratio_docs if doc[1] < RATIO_THRESHOLD]
+                + filing_res
+            )
+        else:
+            fin = [doc[0] for doc in def_docs] + [doc[0] for doc in ratio_docs]
+
         return fin
 
     async def aget_relevant_documents(self, query: str):
