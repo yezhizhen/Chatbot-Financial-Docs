@@ -1,0 +1,18 @@
+
+Example Event Data
+
+The EUR/USD traded within the range of $1.06 after a low option of $1.0650 on the 6th. There are selling orders at $1.0710-$20 and a stop loss above $1.0740, while a buy order exists at $1.0650 and a stop loss below $1.0640. Cautiousness is advised due to potential downside risks as the pair reaches the $1.07 level.The US dollar's rise in 2022, as measured by the Wall Street Journal Dollar Index, has raised concerns about its impact on the global economy. However, investors are now optimistic that the dollar's strength has reached its peak. While the dollar experienced its biggest annual gain since 2014, it has given up roughly half of its gains since reaching its highest level in late September. Additionally, the strengthening peso against the US dollar has helped soften the rise in government debt in November. The dollar's movement will continue to be a key focus for the gold market in relation to interest rates. The de-dollarization trend observed by several central banks is expected to provide support for the gold market.
+
+
+(OpenAI Prompt 1) Summarize the below for an university student in 100 words or less: 
+
+The EUR/USD currency pair has been trading within the range of $1.06 to $1.0710 after hitting a low of $1.0650 on the 6th. Investors are advised to be cautious when trading this pair as it approaches the $1.07 level due to potential downside risks. The US dollar has experienced its biggest annual gain since 2014, however, it has since given up half of its gains since hitting its highest level in late September. The strengthening peso against the US dollar has helped to soften government debt in November. The de-dollarization trend being observed by several central banks is likely to provide support for the gold market.
+
+(OpenAI Prompt 2) Summarize the below for a begginer investor, by providing wider explanation and context in 4 bulletpoints. In less than 50 characters, the first bulletpoint should be an overall summary. In less than 50 characters, the second bulletpoint should be an investors analysis of current status. In less than 50 characters, the third bulletpoint should describe what investors expect to happen. In less than 50 characters, the fourth bulletpoint should focus on why this information may be important to any scheduled economic calendar events.
+
+Overall: EUR/USD traded within range of $1.06. 
+Investor Analysis: Cautiousness advised due to potential downside risks.
+Expectations: USD strength has reached its peak. 
+Importance: Dollar's movement key for gold market in relation to interest rates.
+
+
