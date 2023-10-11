@@ -21,10 +21,7 @@ from os import path
 import json
 
 
-# the relative path to the python project path. "Front End OCBC" in this case
-
-
-@st.cache_resource
+@st.cache_resource(show_spinner="Loading corresponding vectorstore...")
 def get_vectorstore(market):  # n, k
     # print(f"Using vectorestore {args.vectorstore}, looking back {args.n} years earlier than the latest found, among {args.k} closest docs")
     print(f"Getting vectorstore in {market}")
@@ -40,7 +37,7 @@ def get_vectorstore(market):  # n, k
     # qa_chain = get_chain(vectorstore, args.n, args.k)
 
 
-@st.cache_resource
+@st.cache_resource(show_spinner="Loading ChatCX retriever...")
 def get_retriever(window_length_of_years, num_initial_docs, market):
     from query_data import latest_n_year_retriever
 
@@ -57,7 +54,7 @@ def get_retriever(window_length_of_years, num_initial_docs, market):
     )
 
 
-@st.cache_resource
+@st.cache_resource(show_spinner="Loading ChatCX resources...")
 def get_qa_chain(market, window_length_of_years, num_initial_docs):
     print(
         f"Getting chain with window length: {window_length_of_years}, docs limit: {num_initial_docs}, in {market}"
@@ -76,7 +73,11 @@ def get_qa_chain(market, window_length_of_years, num_initial_docs):
     prompt = PromptTemplate(template=template, input_variables=["context", "question"])
 
     return get_chain(
-        get_vectorstore(market), window_length_of_years, num_initial_docs, prompt
+        get_vectorstore(market),
+        window_length_of_years,
+        num_initial_docs,
+        prompt,
+        st.session_state.education_mode,
     )
 
 

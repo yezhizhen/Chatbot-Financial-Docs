@@ -99,7 +99,7 @@ class latest_n_year_retriever(BaseRetriever):
 # return documents in latest the year among results
 
 
-def get_chain(vectorstore, n=2, k=4, prompt=default_prompt):
+def get_chain(vectorstore, n=2, k=4, prompt=default_prompt, education_mode=False):
     template_token = my_util.num_tokens_from_string(template, MODEL)
     print(f"Template occpuies {template_token} tokens")
     qa_chain = ConversationalRetrievalChain.from_llm(
@@ -109,7 +109,9 @@ def get_chain(vectorstore, n=2, k=4, prompt=default_prompt):
         # default retriever:
         # vectorstore.as_retriever(),
         latest_n_year_retriever(
-            vectorstore.as_retriever(search_kwargs={"k": k}, search_type="mmr"), n
+            vectorstore.as_retriever(search_kwargs={"k": k}, search_type="mmr"),
+            n,
+            education_mode,
         ),
         condense_question_prompt=chatcx_rephrase_message,
         # remove memory and pass in "chat_history" when calling for manual passing

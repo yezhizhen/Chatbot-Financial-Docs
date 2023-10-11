@@ -9,7 +9,7 @@ from util import *
 import json
 from os import path
 
-
+# the relative path to the python project path. "Front End OCBC" in this case
 if "relative_dir_name" not in st.session_state:
     st.session_state.relative_dir_name = path.basename(path.dirname(__file__))
 
