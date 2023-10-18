@@ -4,6 +4,7 @@
 # streamlit run "Front End OCBC/chatbot.py" --server.port 4000 --client.toolbarMode minimal --browser.gatherUsageStats False
 # forever start -c "streamlit run" "Front End OCBC/chatbot.py" --server.port 4000 --client.toolbarMode minimal --browser.gatherUsageStats False
 import streamlit as st
+
 from util import *
 
 import json
@@ -149,19 +150,54 @@ def body():
 
 
 def side_bar():
+    """
     st.sidebar.markdown("# User config 🦄")
     st.sidebar.selectbox(
         "Your avatar:", ["🧍‍♀️", "🧍‍♂️", "👧", "👦", "👸", "🤴"], key="avatar"
     )
     st.sidebar.text_input("Your name", key="user_name")
+    """
+
+    # username
+    st.sidebar.write(f'Welcome *{st.session_state["name"]}*')
+
+
+def authenticate():
+    import streamlit_authenticator as stauth
+    import yaml
+    from yaml.loader import SafeLoader
+
+    with open(path.join(st.session_state.relative_dir_name, "config.yaml")) as file:
+        config = yaml.load(file, Loader=SafeLoader)
+        authenticator = stauth.Authenticate(
+            config["credentials"],
+            config["cookie"]["name"],
+            config["cookie"]["key"],
+            config["cookie"]["expiry_days"],
+            config["preauthorized"],
+        )
+        authenticator.login("Welcome to ChatCX", "main")
+
+        if st.session_state["authentication_status"]:
+            authenticator.logout("Logout", "sidebar", key="unique_logout_key")
+            if "logging" not in st.session_state:
+                st.toast(f'Welcome *{st.session_state["name"]}*', icon="✅")
+                st.session_state["logging"] = True
+        elif st.session_state["authentication_status"] is False:
+            st.error("Username/password is incorrect")
+        elif st.session_state["authentication_status"] is None:
+            st.warning("Please enter your username and password")
+            st.session_state.pop("logging", None)
 
 
 heading()
-from chat_core import *
-
 hide_footer()
-side_bar()
-state_init()
+authenticate()
 
+if st.session_state["authentication_status"]:
+    from chat_core import *
 
-body()
+    side_bar()
+    state_init()
+
+    body()
