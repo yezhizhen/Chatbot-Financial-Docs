@@ -1,0 +1,17 @@
+[browser]
+gatherUsageStats = false
+
+# Set the correct URL for CORS and XSRF protection purposes
+# Say. User request goes to here; which is actually NGINX server. 
+# But has to set as this to avoid CORS issue 
+serverAddress = "chat.wealthcx.com"
+
+# Set the correct URL for CORS and XSRF protection purposes
+serverPort = 80 
+
+[server]
+port = 4000
+headless = true
+
+[client]
+toolbarMode = "minimal"
