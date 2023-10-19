@@ -4,8 +4,7 @@
 # streamlit run "Front End OCBC/chatbot.py" --server.port 4000 --client.toolbarMode minimal --browser.gatherUsageStats False
 # forever start -c "streamlit run" "Front End OCBC/chatbot.py" --server.port 4000 --client.toolbarMode minimal --browser.gatherUsageStats False
 import streamlit as st
-
-from util import *
+from my_style import *
 
 import json
 from os import path
@@ -19,7 +18,7 @@ def heading():
     st.set_page_config(
         page_title="WealthCX Chatbot V2",
         # 👋
-        page_icon=path.join(st.session_state.relative_dir_name, "icon.png"),
+        page_icon=path.join(st.session_state.relative_dir_name, "assets", "icon.png"),
         menu_items={
             "About": """# A chatbot for financial statements/documents. \nFor any question about stock recommendation, please contact the Trading Representative of your broker."""
         },
@@ -99,7 +98,10 @@ def body():
                 # st.warning(item[0], icon=st.session_state.avatar)
             # bots turn
             with st.chat_message(
-                "ai", avatar=path.join(st.session_state.relative_dir_name, "icon.png")
+                "ai",
+                avatar=path.join(
+                    st.session_state.relative_dir_name, "assets", "icon.png"
+                ),
             ):
                 item[1]
             # st.success(item[1], icon="🤖")
@@ -167,7 +169,9 @@ def authenticate():
     import yaml
     from yaml.loader import SafeLoader
 
-    with open(path.join(st.session_state.relative_dir_name, "config.yaml")) as file:
+    with open(
+        path.join(st.session_state.relative_dir_name, "config", "credentials.yaml")
+    ) as file:
         config = yaml.load(file, Loader=SafeLoader)
         authenticator = stauth.Authenticate(
             config["credentials"],
@@ -192,6 +196,7 @@ def authenticate():
 
 heading()
 hide_footer()
+background()
 authenticate()
 
 if st.session_state["authentication_status"]:
