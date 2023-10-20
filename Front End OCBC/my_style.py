@@ -12,7 +12,7 @@ def hide_footer():
     st.markdown(hide_streamlit_style, unsafe_allow_html=True)
 
 
-def background():
+def background(file_name):
     import base64
 
     @st.cache_data
@@ -38,7 +38,7 @@ def background():
         st.markdown(page_bg_img, unsafe_allow_html=True)
         return
 
-    set_png_as_page_bg("Front End OCBC/assets/Asset 8-100.jpg")
+    set_png_as_page_bg(file_name)
 
 
 # not used yet

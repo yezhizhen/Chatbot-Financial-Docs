@@ -196,7 +196,7 @@ def authenticate():
 
 heading()
 hide_footer()
-background()
+background(path.join(st.session_state.relative_dir_name, "assets", "Asset 8-100.jpg"))
 authenticate()
 
 if st.session_state["authentication_status"]:
