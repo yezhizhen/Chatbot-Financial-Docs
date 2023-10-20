@@ -20,12 +20,15 @@ def heading():
         # 👋
         page_icon=path.join(st.session_state.relative_dir_name, "assets", "icon.png"),
         menu_items={
-            "About": """# A chatbot for financial statements/documents. \nFor any question about stock recommendation, please contact the Trading Representative of your broker."""
+            "About": """## A chatbot for financial statements/documents. \nFor any question about stock recommendation, please contact the Trading Representative of your broker."""
         },
         initial_sidebar_state="collapsed",
         layout="centered",
     )
-    st.title("ChatCX")
+    st.markdown(
+        "<h1 style='text-align: center;padding-top: 0rem;padding-bottom: 0rem;'>ChatCX</h2>",
+        unsafe_allow_html=True,
+    )
 
 
 def state_init():
