@@ -37,6 +37,8 @@ default_prompt = PromptTemplate(
 class latest_n_year_retriever(BaseRetriever):
     retriever: VectorStoreRetriever
     date_pattern = re.compile(r"(\d+).txt")
+    education_mode = False
+    year_window: int
     ratios_store = FAISS.load_local(
         path.join("embedded_store", "Ratios"), OpenAIEmbeddings()
     )
@@ -47,12 +49,6 @@ class latest_n_year_retriever(BaseRetriever):
     def get_date(self, doc):
         res = self.date_pattern.search(doc.metadata["source"])
         return res.group(1)
-
-    def __init__(self, _retriever, _n, _education_mode=False) -> None:
-        super().__init__()
-        self.retriever = _retriever
-        self.n = _n
-        self.education_mode = _education_mode
 
     def get_relevant_documents(self, query: str):
         # can be paralleled
@@ -76,7 +72,10 @@ class latest_n_year_retriever(BaseRetriever):
             latest_year = self.get_date(initial_docs[0])[:4]
             filing_res = initial_docs
             for i in range(1, len(initial_docs)):
-                if int(self.get_date(initial_docs[i])[:4]) < int(latest_year) - self.n:
+                if (
+                    int(self.get_date(initial_docs[i])[:4])
+                    < int(latest_year) - self.year_window
+                ):
                     filing_res = initial_docs[:i]
                     break
             # put ratio in the middle, in case it takes priority response
@@ -109,9 +108,11 @@ def get_chain(vectorstore, n=2, k=4, prompt=default_prompt, education_mode=False
         # default retriever:
         # vectorstore.as_retriever(),
         latest_n_year_retriever(
-            vectorstore.as_retriever(search_kwargs={"k": k}, search_type="mmr"),
-            n,
-            education_mode,
+            retriever=vectorstore.as_retriever(
+                search_kwargs={"k": k}, search_type="mmr"
+            ),
+            year_window=n,
+            education_mode=education_mode,
         ),
         condense_question_prompt=chatcx_rephrase_message,
         # remove memory and pass in "chat_history" when calling for manual passing

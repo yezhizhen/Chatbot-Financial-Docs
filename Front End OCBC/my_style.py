@@ -5,7 +5,6 @@ def hide_footer():
     # #MainMenu {visibility: hidden;}
     hide_streamlit_style = """
                 <style>
-                
                 footer {visibility: hidden;}
                 </style>
                 """

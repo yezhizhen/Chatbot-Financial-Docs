@@ -16,7 +16,7 @@ if "relative_dir_name" not in st.session_state:
 
 def heading():
     st.set_page_config(
-        page_title="WealthCX Chatbot V2",
+        page_title="ChatCX",
         # 👋
         page_icon=path.join(st.session_state.relative_dir_name, "assets", "icon.png"),
         menu_items={
