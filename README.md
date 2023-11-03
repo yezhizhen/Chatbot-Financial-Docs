@@ -15,4 +15,4 @@ Custom prompts are used to ground the answers in the state of the union text fil
 
 ## Running the Application
 
-By running `python app.py` from the command line you can easily interact with your ChatGPT over your own data.
+By running `python cli_app.py` from the command line you can easily interact with your ChatGPT over your own data.
